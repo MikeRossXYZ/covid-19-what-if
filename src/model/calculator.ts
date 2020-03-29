@@ -13,13 +13,10 @@ export function calculateTimeSeries(startInfected: number, projectionLength: num
     let decayRate = startDecayRate;
     for (let day = 0; day < projectionLength; day++) {
         // If changes take place today, then apply them at the beginning of the day
-        console.log(changes)
         changes.forEach((chgItem) => {
-            console.log(chgItem)
             if (chgItem[0] == day) {
                 if (chgItem[1] == "decay") {
                     decayRate = chgItem[2];
-                    console.log("Updated decay!")
                 } else if (chgItem[1] == "growth") {
                     growthRate = chgItem[2];
                 }
