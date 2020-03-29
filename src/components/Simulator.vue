@@ -3,14 +3,15 @@
     <h1>COVID-19 Infection Simulation</h1>
     <p>Use the parameters under the chart to visualize how infection growth rate and intervention measures can impact the number of COVID-19 cases.</p>
     <highcharts :options="chartOptions"></highcharts>
-    <h2>Parameters</h2>
+    <button class="btn btn-success" @click="updateChart">Re-generate chart</button>
+    <h2 style="margin-top: 1.25rem">Parameters</h2>
     <div class="form-group">
       <label>Initial number of cases</label>
-      <input class="form-control" type="number" v-model="startInfected" />
+      <input class="form-control" type="number" v-model="startInfected" step=1 min=0 width=20 />
     </div>
     <div class="form-group">
       <label>Projection length (days)</label>
-      <input class="form-control" type="number" v-model="projectionLengthInDays" />
+      <input class="form-control" type="number" v-model="projectionLengthInDays" step=1 min=0 width=20 />
     </div>
     <h3>Scenarios</h3>
     <table class="table">
@@ -36,13 +37,14 @@
             <input type="number" v-model="scenario.interventionStartDay" step=1 />
           </td>
           <td>
-            <span @click="removeScenario(idx)">X</span>
+            <button class="btn btn-warning" @click="removeScenario(idx)">X</button>
           </td>
         </tr>
       </tbody>
     </table>
-    <button @click="addScenario">Add Scenario</button>
-    <button @click="updateChart">Update</button>
+    <div class="scenario-btns">
+      <button class="btn btn-primary" @click="addScenario">Add Scenario</button>
+    </div>
   </div>
 </template>
 
@@ -59,15 +61,23 @@ import {calculateTimeSeries as calcTimeSeries} from '@/model/calculator';
 export default class Simulator extends Vue {
   @Prop() private msg!: string;
 
-  projectionLengthInDays = 100;
+  projectionLengthInDays = 45;
   startInfected = 100;
 
-  scenarioOptions = [{
-    startGrowthRate: 0.50,
-    startDecayRate: 1,
-    interventionStartDay: 7,
-    interventionType: "Medium",
-  }];
+  scenarioOptions = [
+    {
+      startGrowthRate: 0.40,
+      startDecayRate: 1,
+      interventionStartDay: 7,
+      interventionType: "Medium",
+    },
+    {
+      startGrowthRate: 0.50,
+      startDecayRate: 1,
+      interventionStartDay: 14,
+      interventionType: "High",
+    },
+  ];
 
   chartOptions = {
     title: null,
@@ -111,7 +121,7 @@ export default class Simulator extends Vue {
 
   removeScenario(idx: number) {
     if (this.scenarioOptions.length == 1) {
-      window.alert("Cannot delete last scenario.");
+      window.alert("Cannot delete if only one scenario.");
       return;
     }
     this.scenarioOptions.splice(idx);
@@ -136,4 +146,7 @@ export default class Simulator extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.scenario-btns {
+  margin-bottom: 2rem;
+}
 </style>
