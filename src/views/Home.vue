@@ -3,7 +3,7 @@
     <div class="container">
     </div>
     <Simulator/>
-    <div class="footer"></div>
+    <div class="container footer">Author: Mike Ross. All source code is licenced under the GNU General Public Licence v3.</div>
   </div>
 </template>
 
@@ -18,3 +18,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.footer {
+  margin-top: 8rem;
+}
+</style>
