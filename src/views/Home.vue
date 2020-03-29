@@ -3,6 +3,7 @@
     <div class="container">
     </div>
     <Simulator/>
+    <div class="footer"></div>
   </div>
 </template>
 

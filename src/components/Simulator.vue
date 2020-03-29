@@ -79,7 +79,7 @@ export default class Simulator extends Vue {
     },
   ];
 
-  chartOptions = {
+  chartOptions: any = {
     title: null,
     xAxis:{
       title: {
