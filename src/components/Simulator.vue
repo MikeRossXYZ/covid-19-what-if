@@ -1,7 +1,47 @@
 <template>
-  <div class="hello">
+  <div class="container">
+    <h1>COVID-19 Infection Simulation</h1>
+    <p>Use the parameters under the chart to visualize how infection growth rate and intervention measures can impact the number of COVID-19 cases.</p>
     <highcharts :options="chartOptions"></highcharts>
-    {{ calculateTimeSeries() }}
+    <h2>Parameters</h2>
+    <div class="form-group">
+      <label>Initial number of cases</label>
+      <input class="form-control" type="number" v-model="startInfected" />
+    </div>
+    <div class="form-group">
+      <label>Projection length (days)</label>
+      <input class="form-control" type="number" v-model="projectionLengthInDays" />
+    </div>
+    <h3>Scenarios</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Growth rate</th>
+          <th scope="col">Scale of intervention</th>
+          <th scope="col">Intervention start day</th>
+          <th scope="col">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(scenario, idx) in scenarioOptions" v-bind:key="idx">
+          <td><input type="number" v-model="scenario.startGrowthRate" step=0.01 max=1 min=0 /></td>
+          <td>
+            <select v-model="scenario.interventionType">
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+            </select>
+          </td>
+          <td>
+            <input type="number" v-model="scenario.interventionStartDay" step=1 />
+          </td>
+          <td>
+            <span @click="removeScenario(idx)">X</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button @click="addScenario">Add Scenario</button>
     <button @click="updateChart">Update</button>
   </div>
 </template>
@@ -21,42 +61,79 @@ export default class Simulator extends Vue {
 
   projectionLengthInDays = 100;
   startInfected = 100;
-  startGrowthRate = 0.50;
-  startDecayRate = 0.90;
 
-  calculateTimeSeries() {
-    return calcTimeSeries(this.startInfected, this.projectionLengthInDays, this.startGrowthRate, this.startDecayRate, []);
-  }
+  scenarioOptions = [{
+    startGrowthRate: 0.50,
+    startDecayRate: 1,
+    interventionStartDay: 7,
+    interventionType: "Medium",
+  }];
 
   chartOptions = {
-    series: [{
-      data: [1,2]
-    }]
+    title: null,
+    xAxis:{
+      title: {
+        text: "Day number",
+      },
+    },
+    yAxis: {
+      title: {
+        text: "Number of infected",
+      },
+    },
+    series: [],
+  };
+
+  mounted() {
+    this.updateChart();
+  }
+  
+  addScenario() {
+    const lastScenario = this.scenarioOptions[this.scenarioOptions.length-1];
+    const newScenario = {
+      startGrowthRate: Number(lastScenario.startGrowthRate),
+      startDecayRate: Number(lastScenario.startDecayRate),
+      interventionStartDay: Number(lastScenario.interventionStartDay),
+      interventionType: lastScenario.interventionType,
+    }
+    this.scenarioOptions.push(newScenario);
+  }
+
+  interventionToDecayRate(interventionType: string) {
+    if (interventionType == "High") {
+      return 0.87;
+    } else if (interventionType == "Medium") {
+      return 0.91;
+    } else {
+      return 0.95;
+    }
+  }
+
+  removeScenario(idx: number) {
+    if (this.scenarioOptions.length == 1) {
+      window.alert("Cannot delete last scenario.");
+      return;
+    }
+    this.scenarioOptions.splice(idx);
   }
 
   updateChart() {
     this.chartOptions.series = [];
-    this.chartOptions.series.push({
-      data: calcTimeSeries(this.startInfected, this.projectionLengthInDays, this.startGrowthRate, this.startDecayRate, [])
-    })
+    this.scenarioOptions.forEach((scenario) => {
+      this.chartOptions.series.push({
+        name: "Growth " + String(scenario.startGrowthRate) + ", with " + scenario.interventionType + " intervention on day " + scenario.interventionStartDay,
+        data: calcTimeSeries(
+          Number(this.startInfected),
+          Number(this.projectionLengthInDays),
+          Number(scenario.startGrowthRate),
+          Number(scenario.startDecayRate),
+          [[Number(scenario.interventionStartDay), 'decay', this.interventionToDecayRate(scenario.interventionType)]])
+      })
+    });
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
 </style>
