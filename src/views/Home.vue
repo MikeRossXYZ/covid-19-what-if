@@ -3,7 +3,7 @@
     <div class="container">
     </div>
     <Simulator/>
-    <div class="container footer">Author: Mike Ross. All source code is licenced under the GNU General Public Licence v3.</div>
+    <div class="container footer">Author: Mike Ross. Source code: <a href="https://github.com/MikeRossXYZ/covid-19-what-if">https://github.com/MikeRossXYZ/covid-19-what-if</a></div>
   </div>
 </template>
 

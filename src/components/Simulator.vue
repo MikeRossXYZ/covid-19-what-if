@@ -68,13 +68,13 @@ export default class Simulator extends Vue {
     {
       startGrowthRate: 0.40,
       startDecayRate: 1,
-      interventionStartDay: 7,
+      interventionStartDay: 10,
       interventionType: "Medium",
     },
     {
-      startGrowthRate: 0.50,
+      startGrowthRate: 0.70,
       startDecayRate: 1,
-      interventionStartDay: 14,
+      interventionStartDay: 3,
       interventionType: "High",
     },
   ];
